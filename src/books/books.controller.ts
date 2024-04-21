@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, HttpCode, HttpStatus, Query, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, HttpCode, HttpStatus, Query, UploadedFile, Put } from '@nestjs/common';
 import { BooksService } from './books.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
@@ -23,18 +23,50 @@ export class BooksController {
   }
 
   @ApiOperation({ summary: 'Search product' })
-  @Get('/search')
-  search(@Body() findBookDto:FindBookDto) {
-    return this.booksService.search(findBookDto);
+  @Get('search/book')
+  searchBook(@Body() findBookDto:FindBookDto) {
+    return this.booksService.searchBook(findBookDto);
+  }
+
+  @ApiOperation({ summary: 'Search product' })
+  @Get('search/canstavar')
+  searchCans(@Body() findBookDto:FindBookDto) {
+    return this.booksService.searchCanst(findBookDto);
   }
 
 
   @ApiOperation({ summary: 'Get books' })
   @ApiResponse({ status: 200, type: [Books] })
   @HttpCode(HttpStatus.OK)
-  @Get('all')
-  findAll(@Query('limit') limit: number, @Query('skip') skip: number) {
-    return this.booksService.findAll(limit, skip);
+  @Get('all/book')
+  findAllBook(@Query('limit') limit: number, @Query('skip') skip: number) {
+    return this.booksService.findAllBooks(limit, skip);
+  }
+
+
+  @ApiOperation({ summary: 'Get books' })
+  @ApiResponse({ status: 200, type: [Books] })
+  @HttpCode(HttpStatus.OK)
+  @Get('all/canstavar')
+  findAllCans(@Query('limit') limit: number, @Query('skip') skip: number) {
+    return this.booksService.findAllCanst(limit, skip);
+  }
+
+
+  @ApiOperation({ summary: 'Top rated' })
+  @ApiResponse({ status: 200,type:[Books] })
+  @HttpCode(HttpStatus.OK)
+  @Get('topRated')
+  TopRated() {
+    return this.booksService.top_rated();
+  }
+
+  @ApiOperation({ summary: 'Sold rating' })
+  @ApiResponse({ status: 200, type: [Books] })
+  @HttpCode(HttpStatus.OK)
+  @Get('soldRated')
+  SoldRated() {
+    return this.booksService.sold_rated();
   }
 
   

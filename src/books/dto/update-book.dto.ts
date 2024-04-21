@@ -58,5 +58,12 @@ export class UpdateBookDto  {
     @IsOptional()
     publisher?: string;
   
+    @ApiProperty({
+      example: 4,
+      description: 'Book`s publisher',
+    })
+    @IsOptional()
+    sold_rating?: number;
+  
   
 }

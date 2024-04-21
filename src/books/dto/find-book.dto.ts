@@ -46,7 +46,7 @@ export class FindBookDto {
   })
   @IsString()
   @IsOptional()
-  end_pirce?: number;
+  end_price?: number;
 
   @ApiProperty({
     example: '30',
