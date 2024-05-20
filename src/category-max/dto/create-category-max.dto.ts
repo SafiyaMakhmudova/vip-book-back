@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { Status } from "../models/category-max.model";
 
 export class CreateCategoryMaxDto {
     @ApiProperty({example:'Fiction', description:"Category nomi"})
@@ -11,5 +12,12 @@ export class CreateCategoryMaxDto {
     @IsNotEmpty()
     total: number;
 
- 
+    @ApiProperty({
+        example: 'Canstavar',
+        description: 'The status of book',
+      })
+      @IsEnum(Status)
+      status: Status;
+    
+    
 }

@@ -150,7 +150,7 @@ export class BooksService {
 
   async searchBook(findBookDto: FindBookDto) {
     const where = {};
-
+    
     if (findBookDto.name) {
       where['name'] = {
         [Op.like]: `%${findBookDto.name}%`,
@@ -193,7 +193,7 @@ export class BooksService {
     }
 
     const book = await Books.findAll({ where, include: { all: true } });
-
+    
     let filteredData1;
     let filteredData2;
 
@@ -216,7 +216,10 @@ export class BooksService {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
 
-    return statusBooks;
+    return {
+      books:statusBooks,
+      status:200
+    };
   }
 
 
@@ -295,13 +298,13 @@ export class BooksService {
     const booksWithTrueComments = await this.bookRepo.findOne({
       where: { id },
       include: [
-        {
-          model: Comment,
-          where: { status: 'true' },
+        {all:true
+          // model: Comment,
+          // where: { status: 'true' },
         },
       ],
     });
-
+    
     if (!booksWithTrueComments) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
@@ -342,4 +345,60 @@ export class BooksService {
 
     return this.fileService.removeFile(book.image);
   }
+
+  async search(name: string, limit: number, skip: number) {
+    const where = {};
+    console.log(name, limit);
+    
+    if (name) {
+      where['$category_Mini.name$'] = {
+        [Op.like]: `%${name}%`,
+      };
+    }
+
+    const book = await this.bookRepo.findAll({
+      where,
+      include: [{all:true}],
+      order: [['sold_rating', 'DESC']],
+    });
+
+    if (book.length === 0) {
+      return {
+        message: 'Category Not Found',
+        status: HttpStatus.NOT_FOUND,
+      };
+    }
+
+    let limit_books = [];
+    if (skip === 1 || skip < 1) {
+      let num = 0;
+      for (let index = num; index < num + limit; index++) {
+        if (book[index] === undefined) break;
+
+        limit_books.push(book[index]);
+      }
+    } else {
+      let num = (skip - 1) * limit;
+      for (let index = num; index < num + limit; index++) {
+        if (book[index] === undefined) break;
+
+        limit_books.push(book[index]);
+      }
+    }
+
+    if (limit_books.length === 0)
+      return {
+        message: 'Category Not Found',
+        status: HttpStatus.NOT_FOUND,
+      };
+
+    const total = book.length;
+
+    return {
+      status: HttpStatus.OK,
+      limit_books,
+      total,
+    };
+  }
+
 }

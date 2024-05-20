@@ -12,6 +12,8 @@ const start = async () => {
     app.useGlobalPipes(new ValidationPipe());
     app.setGlobalPrefix('/api');
     app.use(cookieParser());
+    app.enableCors();
+    // app.use(express.static('public'));
 
     const config = new DocumentBuilder()
       .setTitle('Online book shop')

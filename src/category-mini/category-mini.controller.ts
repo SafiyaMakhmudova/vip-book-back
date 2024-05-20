@@ -8,6 +8,7 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { CategoryMiniService } from './category-mini.service';
 import { CreateCategoryMiniDto } from './dto/create-category-mini.dto';
@@ -37,7 +38,7 @@ export class CategoryMiniController {
     return this.categoryMiniService.findAll();
   }
 
-  
+
   @ApiOperation({summary:'find one category by id'})
   @ApiResponse({status:200, type:[CategoryMini]})
   @Get(':id')

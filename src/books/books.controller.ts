@@ -23,7 +23,7 @@ export class BooksController {
   }
 
   @ApiOperation({ summary: 'Search product' })
-  @Get('search/book')
+  @Post('search/book')
   searchBook(@Body() findBookDto:FindBookDto) {
     return this.booksService.searchBook(findBookDto);
   }
@@ -67,6 +67,16 @@ export class BooksController {
   @Get('soldRated')
   SoldRated() {
     return this.booksService.sold_rated();
+  }
+
+  @ApiOperation({ summary: 'Search Category name' })
+  @ApiResponse({ status: 200, type: [Books] })
+  @HttpCode(HttpStatus.OK)
+  @Get('search')
+  findAllSearch(
+    @Query('name') name: string, @Query('limit') limit: number, @Query('skip') skip: number
+    ) {
+    return this.booksService.search(name,limit, skip);
   }
 
   

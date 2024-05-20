@@ -5,6 +5,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { CategoryMax } from './models/category-max.model';
 import { JwtModule } from '@nestjs/jwt';
 import { FilesModule } from '../files/files.module';
+import { Books } from '../books/models/book.model';
 
 @Module({
   imports:[SequelizeModule.forFeature([CategoryMax]), JwtModule.register({}), FilesModule],

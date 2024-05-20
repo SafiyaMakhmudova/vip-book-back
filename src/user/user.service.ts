@@ -4,6 +4,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './models/user.model';
 import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
+import * as PDFDocument from 'pdfkit';
+import { createWriteStream } from 'fs';
 
 @Injectable()
 export class UserService {
@@ -33,8 +36,25 @@ export class UserService {
     };
   }
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  create(createUserDto: CreateUserDto, res:Response) {
+    try {
+      const doc = new PDFDocument();
+      // PDF yaratish uchun kerakli kod
+      // JSON ma'lumotlarini PDFga qo'shish
+      doc.fontSize(12).text(JSON.stringify(createUserDto, null, 2));
+      // PDF faylini yaratish
+      doc.pipe(createWriteStream('output.pdf'));
+      doc.end();
+      // PDF faylini javob sifatida qaytarish
+      res.download('output.pdf');
+      console.log("fayle", res.download('output.pdf'));
+      
+    } catch (error) {
+      console.log("---", error);
+      
+      // res.json({ error: 'Failed to convert JSON to PDF' });
+    }
+  
   }
 
   findAll() {

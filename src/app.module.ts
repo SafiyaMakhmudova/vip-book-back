@@ -13,6 +13,10 @@ import { Books } from './books/models/book.model';
 import { CommentModule } from './comment/comment.module';
 import { Comment } from './comment/models/comment.model';
 import { User } from './user/models/user.model';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { resolve } from 'path';
+import { TelegrafModule } from 'nestjs-telegraf';
+import { BotUpdate } from './bot_update';
 
 @Module({
   imports: [
@@ -20,7 +24,15 @@ import { User } from './user/models/user.model';
       envFilePath: '.env',
       isGlobal: true,
     }),
-
+    ServeStaticModule.forRoot({
+      rootPath: resolve('src', 'static'),
+    }),
+    // TelegrafModule.forRoot({
+    //   token: process.env.BOT_API_TOKEN,
+    // }),
+    TelegrafModule.forRoot({
+      token:process.env.BOT_API_TOKEN
+    }),
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: process.env.POSTGRES_HOST,
@@ -42,6 +54,6 @@ import { User } from './user/models/user.model';
   ],
 
   controllers: [],
-  providers: [],
+  providers: [BotUpdate],
 })
 export class AppModule {}

@@ -13,13 +13,18 @@ export enum Discount {
     '70%' = 70,
   }
   
-  
+  export enum Status {
+    Book = 'Book',
+    Canstavar = 'Canstavar'
+  }
+
 
 interface CategMaxAttrs {
     name: string;
     total: number;
     img:string;
     discount:Discount;
+    status:Status;
 }
 
 @Table({tableName:'CategoryMax'})
@@ -65,6 +70,18 @@ export class CategoryMax extends Model<CategoryMax, CategMaxAttrs> {
       })
       discount: Discount;
     
+      @ApiProperty({
+        example: 'Canstavar',
+        description: 'The status of book',
+      })
+      @Column({
+        type: DataType.ENUM,
+        values: ['Book', 'Canstavar'],
+        allowNull: false,
+      })
+      status: Status;
+    
+      
     
   @HasMany(() => Books)
   book: Books[]

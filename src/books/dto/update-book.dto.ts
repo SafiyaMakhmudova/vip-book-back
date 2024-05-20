@@ -65,5 +65,12 @@ export class UpdateBookDto  {
     @IsOptional()
     sold_rating?: number;
   
+    @ApiProperty({
+      example: 4,
+      description: 'category updated',
+    })
+    @IsOptional()
+    mini_category_id?: number;
+  
   
 }

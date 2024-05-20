@@ -30,9 +30,11 @@ export class CategoryMaxService {
     return category;
   }
 
-  async findAllCateMax(limit: number, skip: number): Promise<Object> {
+  async findAllBookCateMax(limit: number, skip: number): Promise<Object> {
     const cateMaxs = await this.categoryMaxRepo.findAll({
       order: [['createdAt', 'DESC']],
+      where: {status: 'Book'},
+      include: {all:true}
     });
 
     if (cateMaxs.length === 0) {
@@ -73,6 +75,53 @@ export class CategoryMaxService {
       total,
     };
   }
+
+  async findAllCanstaCateMax(limit: number, skip: number): Promise<Object> {
+    const cateMaxs = await this.categoryMaxRepo.findAll({
+      order: [['createdAt', 'DESC']],
+      where: {status: 'Canstavar'},
+      include: {all:true}
+    });
+
+    if (cateMaxs.length === 0) {
+      return {
+        message: 'Category Not Found',
+        status: HttpStatus.NOT_FOUND,
+      };
+    }
+
+    let limit_cateMaxs = [];
+    if (skip === 1 || skip < 1) {
+      let num = 0;
+      for (let index = num; index < num + limit; index++) {
+        if (cateMaxs[index] === undefined) break;
+
+        limit_cateMaxs.push(cateMaxs[index]);
+      }
+    } else {
+      let num = (skip - 1) * limit;
+      for (let index = num; index < num + limit; index++) {
+        if (cateMaxs[index] === undefined) break;
+
+        limit_cateMaxs.push(cateMaxs[index]);
+      }
+    }
+
+    if (limit_cateMaxs.length === 0)
+      return {
+        message: 'Category Not Found',
+        status: HttpStatus.NOT_FOUND,
+      };
+
+    const total = cateMaxs.length;
+
+    return {
+      status: HttpStatus.OK,
+      limit_cateMaxs,
+      total,
+    };
+  }
+
 
   async findById(id: number): Promise<CategoryMax> {
     const category = await this.categoryMaxRepo.findOne({

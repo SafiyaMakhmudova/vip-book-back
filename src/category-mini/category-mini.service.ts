@@ -3,11 +3,14 @@ import { CreateCategoryMiniDto } from './dto/create-category-mini.dto';
 import { UpdateCategoryMiniDto } from './dto/update-category-mini.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { CategoryMini } from './models/category-mini.model';
+import { Op } from 'sequelize';
+import { Books } from '../books/models/book.model';
 
 @Injectable()
 export class CategoryMiniService {
   constructor(
     @InjectModel(CategoryMini) private categoryRepo: typeof CategoryMini,
+    @InjectModel(Books) private bookRepo: typeof Books,
   ) {}
 
   async create(createCategoryMiniDto: CreateCategoryMiniDto) {
@@ -19,6 +22,7 @@ export class CategoryMiniService {
     return this.categoryRepo.findAll({ include: { all: true } });
   }
 
+  
   async findOne(id: number): Promise<CategoryMini> {
     const category = await this.categoryRepo.findOne({
       include: { all: true },
@@ -30,14 +34,16 @@ export class CategoryMiniService {
     return category;
   }
 
-  async update(id: number, updateCategoryMiniDto: UpdateCategoryMiniDto): Promise<CategoryMini> {
-    
+  async update(
+    id: number,
+    updateCategoryMiniDto: UpdateCategoryMiniDto,
+  ): Promise<CategoryMini> {
     const category = await this.categoryRepo.update(updateCategoryMiniDto, {
       where: { id },
       returning: true,
     });
-    
-    return category[1][0];  
+
+    return category[1][0];
   }
 
   async remove(id: number): Promise<number> {

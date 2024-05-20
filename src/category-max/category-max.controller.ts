@@ -39,10 +39,19 @@ export class CategoryMaxController {
   @ApiOperation({ summary: 'Get categories' })
   @ApiResponse({ status: 200, type: [CategoryMax] })
   @HttpCode(HttpStatus.OK)
-  @Get('all')
-  findAll(@Query('limit') limit: number, @Query('skip') skip: number) {
-    return this.categoryMaxService.findAllCateMax(limit, skip);
+  @Get('all/book/category')
+  findAllBookCate(@Query('limit') limit: number, @Query('skip') skip: number) {
+    return this.categoryMaxService.findAllBookCateMax(limit, skip);
   }
+
+  @ApiOperation({ summary: 'Get categories' })
+  @ApiResponse({ status: 200, type: [CategoryMax] })
+  @HttpCode(HttpStatus.OK)
+  @Get('all/canstavar/category')
+  findAllCanstavarCate(@Query('limit') limit: number, @Query('skip') skip: number) {
+    return this.categoryMaxService.findAllCanstaCateMax(limit, skip);
+  }
+
 
 
   @ApiOperation({ summary: 'Search Category' })
