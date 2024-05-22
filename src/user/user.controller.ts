@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Res, HttpCode, HttpStatus } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -11,15 +11,16 @@ import { Response } from 'express';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
   
   @ApiOperation({ summary: 'Create User' })
   @ApiResponse({
     status: 201,
     type: User,
   })
+  @HttpCode(HttpStatus.CREATED)
   @Post('create')
-  create(@Body() createUserDto: CreateUserDto, res:Response) {
+  create(@Body() createUserDto: CreateUserDto,
+  @Res({ passthrough: true }) res: Response,) {
     return this.userService.create(createUserDto, res);
   }
 

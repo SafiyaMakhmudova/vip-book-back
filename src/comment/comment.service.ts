@@ -10,7 +10,6 @@ export class CommentService {
   constructor(@InjectModel(Comment) private commentRepo: typeof Comment){}
 
 
-
   async create(createCommentDto: CreateCommentDto):Promise<Comment> {
     const comment = await this.commentRepo.create(createCommentDto);
     return comment;

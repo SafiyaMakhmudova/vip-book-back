@@ -3,6 +3,7 @@ import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from '
 import { CategoryMax } from '../../category-max/models/category-max.model';
 import { CategoryMini } from '../../category-mini/models/category-mini.model';
 import { Comment } from '../../comment/models/comment.model';
+import { Cart } from '../../cart/models/cart.model';
 
 export enum Format {
   HARD = 'Hard',
@@ -217,4 +218,6 @@ export class Books extends Model<Books, BookAttrs> {
   @HasMany(() => Comment)
   comments: Comment[]
 
+  @HasMany(() => Cart)
+  carts: Cart[]
 }

@@ -1,6 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
 import { Comment } from '../../comment/models/comment.model';
+import { Order } from '../../order/models/order.model';
+import { Cart } from '../../cart/models/cart.model';
+import { CartItem } from '../../cart_item/models/cart_item.model';
+import { OrderItem } from '../../order_item/models/order_item.model';
 
 interface UserAttrs {
   name: string;
@@ -81,4 +85,16 @@ export class User extends Model<User, UserAttrs> {
   @HasMany(() => Comment)
   comments: Comment[]
 
+  @HasMany(() => Order)
+  orders: Order[]
+
+  @HasMany(() => Cart)
+  carts: Cart[]
+
+  @HasMany(() => CartItem)
+  cart_items: CartItem[]
+
+  
+  @HasMany(() => OrderItem)
+  order_items: OrderItem[]
 }

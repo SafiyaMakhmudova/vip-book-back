@@ -1,7 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { InjectModel } from '@nestjs/sequelize';
+
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectModel } from '@nestjs/sequelize';
 import { User } from './models/user.model';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
@@ -36,24 +38,40 @@ export class UserService {
     };
   }
 
-  create(createUserDto: CreateUserDto, res:Response) {
-    try {
-      const doc = new PDFDocument();
-      // PDF yaratish uchun kerakli kod
-      // JSON ma'lumotlarini PDFga qo'shish
-      doc.fontSize(12).text(JSON.stringify(createUserDto, null, 2));
-      // PDF faylini yaratish
-      doc.pipe(createWriteStream('output.pdf'));
-      doc.end();
-      // PDF faylini javob sifatida qaytarish
-      res.download('output.pdf');
-      console.log("fayle", res.download('output.pdf'));
-      
-    } catch (error) {
-      console.log("---", error);
-      
-      // res.json({ error: 'Failed to convert JSON to PDF' });
+  async create(createUserDto: CreateUserDto, res:Response) {
+    const user = await this.userRepo.findOne({
+      where: { phone_number: createUserDto.phone_number },
+    });
+    console.log("---", user);
+    
+    if (user) {
+      throw new BadRequestException('Phone number already exists!');
     }
+
+    const newUser = await this.userRepo.create(createUserDto)
+    const token = await this.getTokens(newUser);
+
+    const hashed_refresh_token = await bcrypt.hash(token.refresh_token, 7);
+
+    const updateUser = await this.userRepo.update(
+      {
+        hashed_refresh_token: hashed_refresh_token,
+      },
+      { where: { id: newUser.id }, returning: true },
+    );
+
+    res.cookie('refresh_token', token.refresh_token, {
+      maxAge: 15 * 24 * 60 * 60 * 100,
+      httpOnly: true,
+    });
+
+    const response = {
+      status: 201,
+      token,
+      updateUser
+    };
+
+    return response;
   
   }
 

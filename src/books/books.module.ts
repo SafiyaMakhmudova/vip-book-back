@@ -6,10 +6,12 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { JwtModule } from '@nestjs/jwt';
 import { FilesModule } from '../files/files.module';
 import { Comment } from '../comment/models/comment.model';
+import { Cart } from '../cart/models/cart.model';
+import { CartItem } from '../cart_item/models/cart_item.model';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Books, Comment]),
+    SequelizeModule.forFeature([Books, Comment, Cart, CartItem]),
     JwtModule.register({}),
     FilesModule,
   ],

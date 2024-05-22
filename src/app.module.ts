@@ -15,8 +15,15 @@ import { Comment } from './comment/models/comment.model';
 import { User } from './user/models/user.model';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { resolve } from 'path';
-import { TelegrafModule } from 'nestjs-telegraf';
-import { BotUpdate } from './bot_update';
+import { OrderModule } from './order/order.module';
+import { Order } from './order/models/order.model';
+import { CartModule } from './cart/cart.module';
+import { Cart } from './cart/models/cart.model';
+import { CartItemModule } from './cart_item/cart_item.module';
+import { CartItem } from './cart_item/models/cart_item.model';
+import { OrderItemModule } from './order_item/order_item.module';
+import { OrderItem } from './order_item/models/order_item.model';
+import { TelegramBotService } from './telegram-bot.service';
 
 @Module({
   imports: [
@@ -27,12 +34,8 @@ import { BotUpdate } from './bot_update';
     ServeStaticModule.forRoot({
       rootPath: resolve('src', 'static'),
     }),
-    // TelegrafModule.forRoot({
-    //   token: process.env.BOT_API_TOKEN,
-    // }),
-    TelegrafModule.forRoot({
-      token:process.env.BOT_API_TOKEN
-    }),
+ 
+
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: process.env.POSTGRES_HOST,
@@ -40,7 +43,18 @@ import { BotUpdate } from './bot_update';
       username: process.env.POSTGRES_USER,
       password: String(process.env.POSTGRES_PASSWORD),
       database: process.env.POSTGRES_DB,
-      models: [CategoryMax, CategoryMini, Admin, Books, Comment, User],
+      models: [
+        CategoryMax,
+        CategoryMini,
+        Admin,
+        Books,
+        Comment,
+        User,
+        Order,
+        Cart,
+        CartItem,
+        OrderItem,
+      ],
       autoLoadModels: true,
       logging: true,
     }),
@@ -51,9 +65,13 @@ import { BotUpdate } from './bot_update';
     UserModule,
     BooksModule,
     CommentModule,
+    OrderModule,
+    CartModule,
+    CartItemModule,
+    OrderItemModule,
   ],
 
   controllers: [],
-  providers: [BotUpdate],
+  providers: [TelegramBotService],
 })
 export class AppModule {}
