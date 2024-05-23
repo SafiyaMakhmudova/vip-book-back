@@ -4,8 +4,8 @@ import * as TelegramBot from 'node-telegram-bot-api'; // Use named import
 @Injectable()
 export class TelegramBotService implements OnModuleInit {
   private bot: TelegramBot;
-  private readonly token: string = '7074936045:AAHibiHO9BMMPUhobyytVQyQXuXQnDtYlnY';
-  private chatId: string = '6745993329' ;
+  private readonly token: string = process.env.BOT_TOKEN;
+  private chatId: string = process.env.CHAT_ID ;
 
   onModuleInit() {
     this.bot = new TelegramBot(this.token, { polling: true });
