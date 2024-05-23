@@ -8,7 +8,7 @@ export class FilesService {
   async createFile(file: any): Promise<string> {
     try {
       const fileName = uuid.v4() + '.jpg';
-      console.log("rasm", __dirname);
+
       const filePath = path.resolve('src', 'static');
       if (!fs.existsSync(filePath)) {
         fs.mkdirSync(filePath, { recursive: true });

@@ -7,8 +7,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './models/user.model';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
-import * as PDFDocument from 'pdfkit';
-import { createWriteStream } from 'fs';
 
 @Injectable()
 export class UserService {
@@ -38,17 +36,18 @@ export class UserService {
     };
   }
 
-  async create(createUserDto: CreateUserDto, res:Response) {
+  async create(createUserDto: CreateUserDto, res: Response) {
     const user = await this.userRepo.findOne({
       where: { phone_number: createUserDto.phone_number },
     });
-    console.log("---", user);
-    
+
     if (user) {
       throw new BadRequestException('Phone number already exists!');
     }
 
-    const newUser = await this.userRepo.create(createUserDto)
+    const newUser = await this.userRepo.create(createUserDto);
+    console.log("newUser", newUser, createUserDto);
+    
     const token = await this.getTokens(newUser);
 
     const hashed_refresh_token = await bcrypt.hash(token.refresh_token, 7);
@@ -68,11 +67,10 @@ export class UserService {
     const response = {
       status: 201,
       token,
-      updateUser
+      user:updateUser[1][0],
     };
 
     return response;
-  
   }
 
   findAll() {
@@ -106,7 +104,9 @@ export class UserService {
       throw new BadRequestException('User not found');
     }
 
-
-    return await this.userRepo.destroy({where:{id}});
+    return await this.userRepo.destroy({ where: { id } });
   }
+
+  
+ 
 }
