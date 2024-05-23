@@ -348,7 +348,6 @@ export class BooksService {
 
   async search(name: string, limit: number, skip: number) {
     const where = {};
-    console.log(name, limit);
     
     if (name) {
       where['$category_Mini.name$'] = {

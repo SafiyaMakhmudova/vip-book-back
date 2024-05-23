@@ -15,7 +15,8 @@ interface CartAttrs {
   product_id: number;
   user_id: number;
   count: number;
-  price:string;
+  price: string;
+  status: boolean;
 }
 
 @Table({ tableName: 'Cart' })
@@ -60,4 +61,13 @@ export class Cart extends Model<Cart, CartAttrs> {
   })
   price: string;
 
+  @ApiProperty({
+    example: true,
+    description: 'Product Sotvolingan yoki yoqligi',
+  })
+  @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: false,
+  })
+  status: boolean;
 }

@@ -32,6 +32,29 @@ export class CartController {
     return this.cartService.findAll();
   }
 
+  @ApiOperation({ summary: 'View by user id' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of Cart',
+    type: [Cart],
+  })
+  @Get(':user_id/find')
+  findByUser(@Param('user_id') id: string,) {
+    return this.cartService.findCart(id);
+  }
+
+
+  @ApiOperation({ summary: 'View all purchased cart' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of Cart',
+    type: [Cart],
+  })
+  @Get('find/:user_id')
+  findPurchased(@Param('user_id') id: string,) {
+    return this.cartService.findPurchesed(id);
+  }
+
 
   @ApiOperation({summary:'update by id'})
   @ApiResponse({status:202, type:[Cart]})

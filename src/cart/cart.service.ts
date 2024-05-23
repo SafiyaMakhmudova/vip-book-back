@@ -20,6 +20,15 @@ export class CartService {
     return await this.cartRepo.findAll({include:{all:true}});
   }
 
+  async findPurchesed(id:string): Promise<Cart[]> {
+    return await this.cartRepo.findAll({where:{user_id:id, status:true},include:{all:true}});
+  }
+
+  async findCart(id:string): Promise<Cart[]> {
+    return await this.cartRepo.findAll({where:{user_id:id, status:false},include:{all:true}});
+  }
+
+
   async update(id: number, updateCartDto: UpdateCartDto) {
     const cart = await this.cartRepo.findOne({ where: { id } });
     const books = await this.bookRepo.findOne({
