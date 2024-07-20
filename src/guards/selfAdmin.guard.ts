@@ -5,6 +5,8 @@ import {
   Injectable,
   UnauthorizedException,
   ForbiddenException,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Admin } from '../admin/models/admin.model';
@@ -16,13 +18,13 @@ export class selfAdminGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      throw new UnauthorizedException('Admin unauthorized');
+      throw new HttpException('Unauthorized user', HttpStatus.UNAUTHORIZED);
     }
 
     const bearer = authHeader.split(' ')[0];
     const token = authHeader.split(' ')[1];
     if (bearer != 'Bearer' || !token) {
-      throw new UnauthorizedException('Admin unauthorized');
+      throw new HttpException('Unauthorized user', HttpStatus.UNAUTHORIZED);
     }
 
     async function verify(token: string, jwtService: JwtService) {
@@ -31,16 +33,15 @@ export class selfAdminGuard implements CanActivate {
       });
 
       if (!admin) {
-        throw new UnauthorizedException('Invalid token provided');
+      throw new HttpException('Invalid token provided', HttpStatus.UNAUTHORIZED);
       }
       if (!admin.is_active) {
-        throw new BadRequestException('admin is not active');
+      throw new HttpException('admin is not active', HttpStatus.BAD_REQUEST);
+
       }
 
       if (String(admin.id) !== req.params.id) {
-        throw new ForbiddenException({
-          message: 'Ruxsat etilmagan foydalanuvchi',
-        });
+      throw new HttpException('Unauthorized user', HttpStatus.FORBIDDEN);
       }
       return true;
     }

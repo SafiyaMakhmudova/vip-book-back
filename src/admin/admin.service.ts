@@ -45,11 +45,11 @@ export class AdminService {
 
   async registration(createAdminDto: CreateAdminDto, res: Response) {
     const admin = await this.adminRepo.findOne({
-      where: { email: createAdminDto.email },
+      where: { login: createAdminDto.login },
     });
 
     if (admin) {
-      throw new BadRequestException('Email already exists!');
+      throw new BadRequestException('login already exists!');
     }
 
     if (createAdminDto.password !== createAdminDto.confirim_password) {
@@ -87,14 +87,15 @@ export class AdminService {
   }
 
   async login(loginadminDto: LoginAdminDto, res: Response) {
-    const { email, password } = loginadminDto;
-    const admin = await this.adminRepo.findOne({ where: { email } });
-
+    const {  password, login } = loginadminDto;
+    
+    const admin = await this.adminRepo.findOne({ where: { login } });
+    
     if (!admin) {
       throw new UnauthorizedException('Admin not registered');
     }
 
-    if (!admin.is_active) {
+    if (!admin.is_active ) {
       throw new BadRequestException('Admin is not active');
     }
 
@@ -115,29 +116,30 @@ export class AdminService {
     );
 
     res.cookie('refresh_token', tokens.refresh_token, {
-      maxAge: 15 * 24 * 60 * 60 * 100,
+      maxAge: 15 * 24 * 60 * 60 * 1000, // 15 kun
       httpOnly: true,
     });
 
-    const adminWithoutPassword = {
-      id: updatedAdmin[1][0].id,
-      full_name: updatedAdmin[1][0].full_name,
-      email: updatedAdmin[1][0].email,
-      address: updatedAdmin[1][0].address,
-      phone_number: updatedAdmin[1][0].phone_number,
-      role: updatedAdmin[1][0].role,
-      is_active: updatedAdmin[1][0].is_active,
-      hashed_refresh_token: updatedAdmin[1][0].hashed_refresh_token,
-      createdAt: updatedAdmin[1][0].createdAt,
-      updatedAt: updatedAdmin[1][0].updatedAt
-    };
+    // const adminWithoutPassword = {
+    //   id: updatedAdmin[1][0].id,
+    //   full_name: updatedAdmin[1][0].full_name,
+    //   email: updatedAdmin[1][0].login,
+    //   address: updatedAdmin[1][0].address,
+    //   phone_number: updatedAdmin[1][0].phone_number,
+    //   role: updatedAdmin[1][0].role,
+    //   is_active: updatedAdmin[1][0].is_active,
+    //   hashed_refresh_token: updatedAdmin[1][0].hashed_refresh_token,
+    //   createdAt: updatedAdmin[1][0].createdAt,
+    //   updatedAt: updatedAdmin[1][0].updatedAt
+    // };
 
     const response = {
-      message: 'Admin logged in',
-      user: adminWithoutPassword,
+      status:200,
+      user: updatedAdmin[1][0],
       tokens,
     };
-
+    console.log("-------",response);
+    
     return response;
   }
 
@@ -247,7 +249,6 @@ export class AdminService {
     const adminWithoutPassword = {
       id: updatedAdmin[1][0].id,
       full_name: updatedAdmin[1][0].full_name,
-      email: updatedAdmin[1][0].email,
       address: updatedAdmin[1][0].address,
       phone_number: updatedAdmin[1][0].phone_number,
       role: updatedAdmin[1][0].role,
@@ -276,7 +277,6 @@ export class AdminService {
     const adminWithoutPassword = {
       id: updatedAdmin[1][0].id,
       full_name: updatedAdmin[1][0].full_name,
-      email: updatedAdmin[1][0].email,
       address: updatedAdmin[1][0].address,
       phone_number: updatedAdmin[1][0].phone_number,
       role: updatedAdmin[1][0].role,
@@ -290,6 +290,8 @@ export class AdminService {
   }
 
   async refreshToken(admin_id: number, refreshToken: string, res: Response) {
+    console.log("------");
+    
     const decodedToken = this.jwtService.decode(refreshToken);
 
     if (admin_id != decodedToken['id']) {
@@ -320,7 +322,7 @@ export class AdminService {
     );
 
     res.cookie('refresh_token', token.refresh_token, {
-      maxAge: 15 * 24 * 60 * 60 * 100,
+      maxAge: 15 * 24 * 60 * 60 * 1000, // 15 kun
       httpOnly: true,
     });
 
@@ -329,7 +331,8 @@ export class AdminService {
       user: updateAdmin[1][0],
       token,
     };
-
+    console.log("-----", response);
+    
     return response;
   }
 

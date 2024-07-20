@@ -1,47 +1,50 @@
 import {
-  BadRequestException,
   CanActivate,
   ExecutionContext,
+  HttpException,
+  HttpStatus,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 import { Admin } from '../admin/models/admin.model';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
-  canActivate(context: ExecutionContext) {
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      throw new UnauthorizedException('Admin unauthorized');
+      throw new HttpException('Unauthorized user', HttpStatus.UNAUTHORIZED);
     }
 
     const bearer = authHeader.split(' ')[0];
     const token = authHeader.split(' ')[1];
-    if (bearer != 'Bearer' || !token) {
-      throw new UnauthorizedException('Admin unauthorized');
+    if (bearer !== 'Bearer' || !token) {
+      throw new HttpException('Unauthorized user', HttpStatus.UNAUTHORIZED);
     }
 
-    async function verify(token: string, jwtService: JwtService) {
-      const admin: Partial<Admin> = await jwtService.verify(token, {
+
+    try {
+      const admin: Partial<Admin> = await this.jwtService.verifyAsync(token, {
         secret: process.env.ACCESS_TOKEN_KEY,
       });
 
       if (!admin) {
-        throw new UnauthorizedException('Invalid token provided');
+        throw new HttpException('Invalid token provided', HttpStatus.UNAUTHORIZED);
       }
-      if (!admin.is_active ) {
-        throw new BadRequestException('admin is not active');
-      }
-      
-      if (!admin.role ) {
-        throw new BadRequestException('Ruhsat etilmagan foydalanuvchi!');
+      if (!admin.is_active) {
+        throw new HttpException('Admin is not active', HttpStatus.BAD_REQUEST);
       }
       return true;
+    } catch (err) {
+      console.log(err.message);
+      
+      if (err instanceof TokenExpiredError) {
+        throw new HttpException('Token expired', HttpStatus.UNAUTHORIZED);
+      }
+      throw new HttpException('Unauthorized user', HttpStatus.UNAUTHORIZED);
     }
-
-    return verify(token, this.jwtService);
   }
 }

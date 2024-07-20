@@ -122,6 +122,37 @@ export class CategoryMaxService {
     };
   }
 
+  async findAll(limit: number, skip: number): Promise<object> {
+    const offset = (skip - 1) * limit;
+    
+    const { count, rows: categories } = await this.categoryMaxRepo.findAndCountAll({
+      order: [['createdAt', 'DESC']],
+      include: { all: true },
+      limit,
+      offset
+    });
+    const total = await this.categoryMaxRepo.findAll()
+  
+    if (count === 0) {
+      return {
+        message: 'Category Not Found',
+        status: HttpStatus.NOT_FOUND,
+      };
+    }
+  
+    if (categories.length === 0) {
+      return {
+        message: 'Category Not Found',
+        status: HttpStatus.NOT_FOUND,
+      };
+    }
+
+    return {
+      status: HttpStatus.OK,
+      category: categories,
+      total: total.length,
+    };
+  }
 
   async findById(id: number): Promise<CategoryMax> {
     const category = await this.categoryMaxRepo.findOne({

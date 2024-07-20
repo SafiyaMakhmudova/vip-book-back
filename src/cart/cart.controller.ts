@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Cart } from './models/cart.model';
+import { selfClientGuard } from '../guards/selfClient.guard';
 
 @ApiTags("Cart")
 @Controller('cart')
@@ -38,6 +39,7 @@ export class CartController {
     description: 'List of Cart',
     type: [Cart],
   })
+  @UseGuards(selfClientGuard)
   @Get(':user_id/find')
   findByUser(@Param('user_id') id: string,) {
     return this.cartService.findCart(id);
@@ -50,6 +52,7 @@ export class CartController {
     description: 'List of Cart',
     type: [Cart],
   })
+  @UseGuards(selfClientGuard)
   @Get('find/:user_id')
   findPurchased(@Param('user_id') id: string,) {
     return this.cartService.findPurchesed(id);

@@ -10,6 +10,7 @@ import {
   HttpStatus,
   Res,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -21,6 +22,9 @@ import { CookieGetter } from '../decorators/cookieGetter.decorator';
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { Admin } from './models/admin.model';
+import { SuperAdminGuard } from '../guards/superAdmin.guard';
+import { AdminGuard } from '../guards/admin.guard';
+import { selfAdminGuard } from '../guards/selfAdmin.guard';
 
 
 @ApiTags('Admin')
@@ -31,6 +35,7 @@ export class AdminController {
   @ApiOperation({ summary: 'Register Admin' })
   @ApiResponse({ status: 201, type: Admin })
   @HttpCode(HttpStatus.CREATED)
+  // @UseGuards(SuperAdminGuard)
   @Post('sign-up')
   create(
     @Body() createAdminDto: CreateAdminDto,
@@ -53,6 +58,7 @@ export class AdminController {
   @ApiOperation({ summary: 'Logout Admin' })
   @ApiResponse({ status: 200, type: Admin })
   @HttpCode(HttpStatus.OK)
+  @UseGuards(AdminGuard)
   @Post('signout')
   logout(
     @CookieGetter('refresh_token') refreshToken: string,
@@ -63,6 +69,7 @@ export class AdminController {
 
   @ApiOperation({ summary: 'All Admin' })
   @ApiResponse({ status: 200, type: Admin })
+  // @UseGuards(SuperAdminGuard)
   @Get('all')
   findAll(@Query('limit') limit: number, @Query('skip') skip: number) {
     return this.adminService.findAllAdmin(limit, skip);
@@ -71,6 +78,7 @@ export class AdminController {
   @ApiOperation({ summary: 'Search Admin' })
   @ApiResponse({ status: 200, type: Admin })
   @HttpCode(HttpStatus.OK)
+  // @UseGuards(SuperAdminGuard)
   @Get('search')
   findAllFilter(
     @Query('full_name') full_name?: string,
@@ -94,6 +102,7 @@ export class AdminController {
   @ApiOperation({ summary: 'Update by id yourself' })
   @ApiResponse({ status: 201, type: Admin })
   @HttpCode(HttpStatus.OK)
+  @UseGuards(selfAdminGuard)
   @Patch('yourself/:id')
   update(
     @Param('id') id: string,
@@ -105,6 +114,7 @@ export class AdminController {
   @ApiOperation({ summary: 'Update by id by Admin' })
   @ApiResponse({ status: 201, type: Admin })
   @HttpCode(HttpStatus.OK)
+  // @UseGuards(SuperAdminGuard)
   @Patch('update/:id')
   updateAdmin(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
     return this.adminService.updateByAdmin(+id, updateAdminDto);
@@ -121,6 +131,7 @@ export class AdminController {
   @ApiOperation({ summary: 'delete by id by Admin' })
   @ApiResponse({ status: 200, type: NUMBER })
   @HttpCode(204)
+  // @UseGuards(SuperAdminGuard)
   @Delete('remove/:id')
   remove(@Param('id') id: string) {
     return this.adminService.removeByAdmin(+id);

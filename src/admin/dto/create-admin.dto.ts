@@ -7,10 +7,15 @@ export class CreateAdminDto {
   @IsNotEmpty()
   full_name: string;
 
-  @ApiProperty({ example: 'admin@mail.uz', description: 'Admin email' })
-  @IsEmail()
+  @ApiProperty({ example: 'hello', description: 'Admin login' })
+  @IsString()
   @IsNotEmpty()
-  email: string;
+  login: string;
+
+  @ApiProperty({ example: '+998901112233', description: 'Admin telefon raqami' })
+  @IsPhoneNumber()
+  @IsNotEmpty()
+  phone_number: string;
 
   @ApiProperty({ example: 'Uzbek1$t0n', description: 'Admin paroli' })
   @IsString()
@@ -31,11 +36,4 @@ export class CreateAdminDto {
   @IsNotEmpty()
   address: string;
 
-  @ApiProperty({
-    example: '+998881112233',
-    description: 'Admin telefon nomeri',
-  })
-  @IsPhoneNumber()
-  @IsNotEmpty()
-  phone_number: string;
 }

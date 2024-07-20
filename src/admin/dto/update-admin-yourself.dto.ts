@@ -19,10 +19,6 @@ export class UpdateAdminYourselfDto {
   address?: string;
 
 
-  @ApiProperty({ example: 'salima@mail.uz', description: 'Admin emaili' })
-  @IsEmail()
-  @IsOptional()
-  email?: string;
 
   @ApiProperty({
     example: '+998881112233',

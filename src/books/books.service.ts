@@ -1,11 +1,11 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { Books } from './models/book.model';
 import { FilesService } from '../files/files.service';
 import { v4 } from 'uuid';
-import { Op, where } from 'sequelize';
+import { Op, } from 'sequelize';
 import { FindBookDto } from './dto/find-book.dto';
 import { Comment } from '../comment/models/comment.model';
 import { CategoryMax } from '../category-max/models/category-max.model';
@@ -34,12 +34,57 @@ export class BooksService {
   }
 
   async findAllBooks(limit: number, skip: number): Promise<object> {
-    const books = await this.bookRepo.findAll({
+    const offset = (skip - 1) * limit;
+    
+    const { count, rows: books } = await this.bookRepo.findAndCountAll({
       order: [['createdAt', 'DESC']],
       where: { status: 'Book' },
       include: { all: true },
+      limit,
+      offset
     });
+    const total = await this.bookRepo.findAll({where:{status:'Book'}})
+    
+  
+    if (count === 0) {
+      return {
+        message: 'Books Not Found',
+        status: HttpStatus.NOT_FOUND,
+      };
+    }
+  
+    if (books.length === 0) {
+      return {
+        message: 'Books Not Found',
+        status: HttpStatus.NOT_FOUND,
+      };
+    }
+  
+    return {
+      status: HttpStatus.OK,
+      limit_books: books,
+      total: total.length,
+    };
+  }
 
+  async findAll(limit: number, skip: number): Promise<object> {
+    const offset = (skip - 1) * limit;
+    
+    const { count, rows: books } = await this.bookRepo.findAndCountAll({
+      order: [['createdAt', 'DESC']],
+      include: { all: true },
+      limit,
+      offset
+    });
+    const total = await this.bookRepo.findAll()
+  
+    if (count === 0) {
+      return {
+        message: 'Books Not Found',
+        status: HttpStatus.NOT_FOUND,
+      };
+    }
+  
     if (books.length === 0) {
       return {
         message: 'Books Not Found',
@@ -47,81 +92,42 @@ export class BooksService {
       };
     }
 
-    let limit_books = [];
-    if (skip === 1 || skip < 1) {
-      let num = 0;
-      for (let index = num; index < num + limit; index++) {
-        if (books[index] === undefined) break;
-
-        limit_books.push(books[index]);
-      }
-    } else {
-      let num = (skip - 1) * limit;
-      for (let index = num; index < num + limit; index++) {
-        if (books[index] === undefined) break;
-
-        limit_books.push(books[index]);
-      }
-    }
-
-    if (limit_books.length === 0)
-      return {
-        message: 'Books Not Found',
-        status: HttpStatus.NOT_FOUND,
-      };
-
-    const total = books.length;
-
     return {
       status: HttpStatus.OK,
-      limit_books,
-      total,
+      limit_books: books,
+      total: total.length,
     };
   }
 
   async findAllCanst(limit: number, skip: number): Promise<object> {
-    const books = await this.bookRepo.findAll({
+    const offset = (skip - 1) * limit;
+    
+    const { count, rows: books } = await this.bookRepo.findAndCountAll({
       order: [['createdAt', 'DESC']],
       where: { status: 'Canstavar' },
       include: { all: true },
+      limit,
+      offset
     });
-
+    
+    if (count === 0) {
+      return {
+        message: 'Books Not Found',
+        status: HttpStatus.NOT_FOUND,
+      };
+    }
+  
     if (books.length === 0) {
       return {
         message: 'Books Not Found',
         status: HttpStatus.NOT_FOUND,
       };
     }
-
-    let limit_books = [];
-    if (skip === 1 || skip < 1) {
-      let num = 0;
-      for (let index = num; index < num + limit; index++) {
-        if (books[index] === undefined) break;
-
-        limit_books.push(books[index]);
-      }
-    } else {
-      let num = (skip - 1) * limit;
-      for (let index = num; index < num + limit; index++) {
-        if (books[index] === undefined) break;
-
-        limit_books.push(books[index]);
-      }
-    }
-
-    if (limit_books.length === 0)
-      return {
-        message: 'Books Not Found',
-        status: HttpStatus.NOT_FOUND,
-      };
-
-    const total = books.length;
-
+  
     return {
       status: HttpStatus.OK,
-      limit_books,
-      total,
+      limit_books: books,
+      total: count,
     };
   }
 
@@ -333,6 +339,7 @@ export class BooksService {
   async remove(id: number): Promise<Number> {
     await this.removeFile(id);
     const book = await this.bookRepo.destroy({ where: { id } });
+    
     return book;
   }
 
@@ -398,6 +405,24 @@ export class BooksService {
       limit_books,
       total,
     };
+  }
+
+
+  async updateImage(id: number, image: any) {
+    const removeFile = await this.removeFile(id);
+
+    if (!removeFile) {
+      throw new BadRequestException("Don't remove image");
+    }
+
+    const createFile = await this.fileService.createFile(image);
+    const updateFile = await this.bookRepo.update(
+      {
+        image: createFile,
+      },
+      { where: { id }, returning: true },
+    );
+    return updateFile;
   }
 
 }

@@ -1,7 +1,8 @@
 import { PartialType } from '@nestjs/swagger';
 import { CreateBookDto } from './create-book.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import {IsNumber, IsOptional, IsString } from 'class-validator';
+import {IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Format, Status, Type } from '../models/book.model';
 
 export class UpdateBookDto  {
   
@@ -58,19 +59,41 @@ export class UpdateBookDto  {
     @IsOptional()
     publisher?: string;
   
-    @ApiProperty({
-      example: 4,
-      description: 'Book`s publisher',
-    })
-    @IsOptional()
-    sold_rating?: number;
+    
+  @ApiProperty({
+    example: 'Hard',
+    description: 'The cover of the book',
+  })
+  @IsEnum(Format)
+  format: Format;
+
+  @ApiProperty({
+    example: 'EBook',
+    description: 'Type of book',
+  })
+  @IsEnum(Type)
+  type: Type;
+
+  @ApiProperty({
+    example: 'Canstavar',
+    description: 'The status of book',
+  })
+  @IsEnum(Status)
+  status: Status;
+
+
+  @ApiProperty({
+    example: 3,
+    description: 'which category',
+  })
+  mini_category_id:number;
+
   
-    @ApiProperty({
-      example: 4,
-      description: 'category updated',
-    })
-    @IsOptional()
-    mini_category_id?: number;
+  @ApiProperty({
+    example: 4,
+    description: 'which category',
+  })
+  max_category_id:number
   
   
 }

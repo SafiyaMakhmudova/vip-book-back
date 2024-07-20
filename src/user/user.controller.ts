@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Res, HttpCode, HttpStatus, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Res, HttpCode, HttpStatus, Delete, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from './models/user.model';
 import { Response } from 'express';
+import { AdminGuard } from '../guards/admin.guard';
+import { selfClientGuard } from '../guards/selfClient.guard';
 
 
 @ApiTags("User")
@@ -30,6 +32,7 @@ export class UserController {
     description: 'List of User',
     type: [User],
   })
+  @UseGuards(AdminGuard)
   @Get('all')
   findAll() {
     return this.userService.findAll();
@@ -41,6 +44,7 @@ export class UserController {
     status: 200,
     type: User,
   })
+  @UseGuards(selfClientGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userService.findOne(+id);
@@ -52,6 +56,7 @@ export class UserController {
     status: 202,
     type: User,
   })
+  @UseGuards(selfClientGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(+id, updateUserDto);
@@ -59,6 +64,7 @@ export class UserController {
 
   @ApiOperation({ summary: 'remove by id' })
   @ApiResponse({ status: 200, type: Number })
+  @UseGuards(AdminGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);

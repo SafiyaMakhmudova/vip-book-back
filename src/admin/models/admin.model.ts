@@ -9,8 +9,8 @@ export enum Role {
 interface AdminAttrs {
   full_name: string;
   password: string;
-  email: string;
-  phone_number: string;
+  login:string;
+  phone_number:string;
   address: string;
   is_active: boolean;
   role: Role;
@@ -33,14 +33,22 @@ export class Admin extends Model<Admin, AdminAttrs> {
   })
   full_name: string;
 
-  @ApiProperty({ example: 'admin@mail.uz', description: 'Admin email' })
+  @ApiProperty({ example: 'Hello', description: 'Admin login' })
   @Column({
     type: DataType.STRING,
     unique: true,
   })
-  email: string;
+  login: string;
 
-  @ApiProperty({ example: 'Uzbek!$t0n', description: 'Admin paroli' })
+  
+  @ApiProperty({ example: '+998901112233', description: 'Admin telefon raqami' })
+  @Column({
+    type: DataType.STRING,
+  })
+  phone_number: string;
+
+
+  @ApiProperty({ example: 'Uzbek1$t0n', description: 'Admin paroli' })
   @Column({
     type: DataType.STRING,
   })
@@ -52,14 +60,6 @@ export class Admin extends Model<Admin, AdminAttrs> {
   })
   address: string;
 
-  @ApiProperty({
-    example: '+998881112233',
-    description: 'Admin telefon nomeri',
-  })
-  @Column({
-    type: DataType.STRING,
-  })
-  phone_number: string;
 
   @ApiProperty({
     example: 'Admin',
@@ -68,7 +68,7 @@ export class Admin extends Model<Admin, AdminAttrs> {
   @Column({
     type: DataType.ENUM,
     values: ['SuperAdmin', 'Admin'],
-    defaultValue: Role.SUPERADMIN,
+    defaultValue: Role.ADMIN,
   })
   role: Role;
 

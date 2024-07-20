@@ -1,10 +1,9 @@
 import {
-  BadRequestException,
   CanActivate,
   ExecutionContext,
-  ForbiddenException,
+  HttpException,
+  HttpStatus,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../user/models/user.model';
@@ -17,13 +16,13 @@ export class selfClientGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      throw new UnauthorizedException('Client unauthorized');
+      throw new HttpException('Unauthorized user', HttpStatus.UNAUTHORIZED);
     }
 
     const bearer = authHeader.split(' ')[0];
     const token = authHeader.split(' ')[1];
     if (bearer != 'Bearer' || !token) {
-      throw new UnauthorizedException('Client unauthorized');
+      throw new HttpException('Unauthorized user', HttpStatus.UNAUTHORIZED);
     }
 
     async function verify(token: string, jwtService: JwtService) {
@@ -32,13 +31,13 @@ export class selfClientGuard implements CanActivate {
       });
 
       if (!user) {
-        throw new UnauthorizedException('Invalid token provided');
+      throw new HttpException('Unauthorized user', HttpStatus.UNAUTHORIZED);
+
       }
 
       if (String(user.id) !== req.params.id) {
-        throw new ForbiddenException({
-          message: 'Ruxsat etilmagan foydalanuvchi',
-        });
+        throw new HttpException('Unauthorized user', HttpStatus.FORBIDDEN);
+
       }
 
       return true;

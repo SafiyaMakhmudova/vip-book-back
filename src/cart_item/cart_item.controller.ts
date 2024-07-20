@@ -8,12 +8,14 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { CartItemService } from './cart_item.service';
 import { CreateCartItemDto } from './dto/create-cart_item.dto';
 import { UpdateCartItemDto } from './dto/update-cart_item.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CartItem } from './models/cart_item.model';
+import { selfClientGuard } from '../guards/selfClient.guard';
 
 @ApiTags('Cart-item')
 @Controller('cart-item')
@@ -45,6 +47,7 @@ export class CartItemController {
     description: 'List of Cart-item',
     type: [CartItem],
   })
+  @UseGuards(selfClientGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.cartItemService.findOne(+id);

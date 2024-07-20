@@ -1,6 +1,8 @@
 import {
   CanActivate,
   ExecutionContext,
+  HttpException,
+  HttpStatus,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -18,25 +20,21 @@ export class JwtAuthGuard implements CanActivate {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
-      throw new UnauthorizedException({
-        message: 'You are not registered!',
-      });
+      
+      throw new HttpException('You are not registered!', HttpStatus.UNAUTHORIZED);
     }
     const bearer = authHeader.split(' ')[0];
     const token = authHeader.split(' ')[1];
     if (bearer !== 'Bearer' || !token) {
-      throw new UnauthorizedException({
-        message: 'You are not registered!',
-      });
+      throw new HttpException('You are not registeres!', HttpStatus.UNAUTHORIZED);
     }
 
     let user: any;
     try {
       user = this.jwtService.verify(token);
     } catch (error) {
-      throw new UnauthorizedException({
-        message: 'You are not registered!',
-      });
+  
+      throw new HttpException('You are not registeres!', HttpStatus.UNAUTHORIZED);
     }
 
     req.user = user;
