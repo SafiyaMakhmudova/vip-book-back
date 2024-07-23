@@ -89,7 +89,7 @@ export class OrderItemService {
       this.telegramBotService.sendMessage(message);
     } catch (error) {
       console.error(error.message);
-      // throw new BadRequestException("Server error")
+      throw new BadRequestException("Server error")
       // Handle the error as needed, maybe notify the user to send a message to the bot
     }
     result = '';

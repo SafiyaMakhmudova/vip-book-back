@@ -8,9 +8,9 @@ export class TelegramBotService implements OnModuleInit {
   private chatId: string = process.env.CHAT_ID ;
 
   onModuleInit() {
-    this.bot = new TelegramBot(this.token, { polling: true });
+    this.bot = new TelegramBot(this.token);
 
-    this.bot.on('message', (msg) => {
+    this.bot.on('message', (msg) => { 
       this.bot.sendMessage(this.chatId, `Assalomu alaykum hurmatli ${msg.chat.first_name}`);
       
     });
